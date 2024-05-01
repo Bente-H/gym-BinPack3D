@@ -1,6 +1,6 @@
-import gym
-from gym import error, spaces, utils
-from gym.utils import seeding
+import gymnasium as gym
+from gymnasium import error, spaces, utils
+from gymnasium.utils import seeding
 
 import numpy as np
 import copy
@@ -26,7 +26,7 @@ class PackingGame(gym.Env):
     box: you pack boxes into a container
     container: contain boxes
     """
-    metadata = {"render.modes": ["human", "rgb_array"]}
+    metadata = {"render_modes": ["human", "rgb_array"],"render_fps": 30}
 
     def __init__(   self, 
                     container_size = (20, 20, 20),
@@ -108,7 +108,7 @@ class PackingGame(gym.Env):
     def position_to_actionIdx(self, pos):
         assert len(pos) == 2
         assert pos[0] >= 0 and pos[1] >= 0
-        assert pos[0] < self.container_size[0] and pos[1] < self.container_size[1]
+        #assert pos[0] < self.container_size[0] and pos[1] < self.container_size[1]
         return pos[0] * self.container_size[1] + pos[1]
 
     @property
@@ -116,7 +116,8 @@ class PackingGame(gym.Env):
         hmap = self.container.heightMap
         coming_boxes = self.boxSeqGenerator.next_N_boxes()
         firstBox = coming_boxes[0]
-        coming_boxes = np.array([(b.dx,b.dy,b.dz) for b in coming_boxes], dtype=int)
+        coming_boxes = np.array([(b.dx,b.dy,b.dz) for b in coming_boxes], dtype=np.float32)
+        #coming_boxes = coming_boxes.flatten()
 
         if self.genValidPlacementMask:
             mask = []
@@ -135,7 +136,7 @@ class PackingGame(gym.Env):
         return obs
 
     def step(self, action):
-        position = self.actionIdx_to_position(action[0])
+        position = (action[0])
         rotation = action[1]
         box = self.boxSeqGenerator.next_N_boxes()[0]
         if (rotation == Rotate.XY): box.dx, box.dy = box.dy, box.dx
@@ -153,12 +154,13 @@ class PackingGame(gym.Env):
             done = True
         
         info = {'counter':len(self.container.boxes), 'ratio':self.container.get_fill_ratio()}
-        return self.cur_observation, reward, done, info
+        return self.cur_observation, reward, done, info #this is not good
     
-    def reset(self):
+    def reset(self, seed=None):
         self.boxSeqGenerator.reset()
         self.container.reset()
-        return self.cur_observation
+        info = {'counter':len(self.container.boxes), 'ratio':self.container.get_fill_ratio()}
+        return self.cur_observation, info
 
     def render(self, mode='human'):
         from gym_BinPack3D.envs.VisUtil import plot_box

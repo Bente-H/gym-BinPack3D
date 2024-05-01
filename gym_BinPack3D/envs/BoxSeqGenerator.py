@@ -46,7 +46,11 @@ class BoxSeqGenerator(object):
         return box
 
     def _gen_more_boxes(self):
-        raise NotImplementedError
+        while len(self.box_list)<self.n_foreseeable_box:
+            newBox = copy.deepcopy(self.rng.choice(self.box_set))
+            newBox = self._rotate_box(newBox)
+            self.box_list.append( newBox) 
+        #raise NotImplementedError
 
 class RandomBoxCreator(BoxSeqGenerator):
     """

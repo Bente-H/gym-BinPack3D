@@ -49,12 +49,12 @@ class Box(object):
         return f"Box: Size {self.dx} {self.dy} {self.dz} Position {self.x} {self.y} {self.z}"
 
 class Container(object):
-    def __init__(self, dx=10, dy=10, dz=10):
+    def __init__(self, dx=10, dy=12, dz=20):
         self.boxes = []
         self.dx = dx
         self.dy = dy
         self.dz = dz
-        self.heightMap = np.zeros(shape=(dx, dy), dtype=np.int32)
+        self.heightMap = np.zeros(shape=(dx, dy), dtype=np.float32)
 
     def reset(self):
         self.boxes = []
@@ -138,7 +138,7 @@ class Container(object):
         find possible position to place the incoming box, 
         the position shoulf satisfy stability and be accessable
         """
-        action_mask = np.zeros(shape=(self.dx, self.dy), dtype=np.int32)
+        action_mask = np.zeros(shape=(self.dx, self.dy), dtype=np.float32)
         
         for i in range(self.dx-box.dx+1):
             for j in range(self.dy-box.dy+1):
@@ -172,7 +172,7 @@ class Container(object):
         for x in range(dx):
             print ("".join( ["O" if b else "X" for b in arr[x] ]) )
 
-if __name__=="__main__":
+if __name__=="__main__": ## ??
     print("Case 1: normal box place")
     container = Container(5,8,10)
     box1 = Box(4,4,5)
